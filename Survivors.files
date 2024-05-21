@@ -1,0 +1,5 @@
+Survivors.cflags
+Survivors.cxxflags
+Survivors.elf
+include/.gitignore
+src/main.cpp
