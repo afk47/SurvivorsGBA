@@ -9,54 +9,29 @@
 #include "bn_keypad.h"
 #include "bn_math.h"
 #include "bn_sprite_builder.h"
+
 #include "bn_regular_bg_items_whitebg.h"
+
 #include "bn_sprite_items_goblin.h"
+#include "bn_sprite_items_ball.h"
 #include "bn_log.h"
+#include "fightscene.h"
 
 
-
+#include "math.h"
+#include "player.h"
 
 int main()
 {
     bn::core::init();
 
-    bn::sprite_ptr player = bn::sprite_items::goblin.create_sprite(0,0);
 
-
-    bn::regular_bg_ptr bg = bn::regular_bg_items::whitebg.create_bg(0,0);
-
+    Scene* scene = new FightScene();
 
     while(true)
     {
+        scene->Update();
         bn::core::update();
-
-
-        if(bn::keypad::up_held())
-        {
-            player.set_position(player.position().x(),player.position().y()-1);
-            player.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(1));
-        }
-        if(bn::keypad::down_held())
-        {
-            player.set_position(player.position().x(),player.position().y()+1);
-            player.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(0));
-        }
-        if(bn::keypad::left_held())
-        {
-            player.set_position(player.position().x()-1,player.position().y());
-            player.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(2));
-            player.set_vertical_flip(true);
-        }
-        if(bn::keypad::right_held())
-        {
-            player.set_position(player.position().x()+1,player.position().y());
-            player.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(2));
-            player.set_vertical_flip(false);
-        }
-        player.set_rotation_angle(90);
-
-
-
 
     }
 }

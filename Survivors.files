@@ -2,4 +2,12 @@ Survivors.cflags
 Survivors.cxxflags
 Survivors.elf
 include/.gitignore
+src/enemy.cpp
+src/enemy.h
+src/fightscene.cpp
+src/fightscene.h
 src/main.cpp
+src/math.h
+src/player.cpp
+src/player.h
+src/scene.h
