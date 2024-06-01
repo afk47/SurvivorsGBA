@@ -4,45 +4,98 @@
 #include "bn_keypad.h"
 #include "bn_sprite_builder.h"
 
-Player::Player()
-    :sprite(bn::sprite_items::goblin.create_sprite(0,0))
+Player::Player(const bn::camera_ptr& camera)
+    :sprite(bn::sprite_items::goblin.create_sprite(0,0)),camera(camera)
 {
+    sprite.set_camera(camera);
 }
 
-void Player::Update()
+void Player::update()
 {
-    Move();
+    move();
 
-    sprite.set_rotation_angle(90);
+
+
+    if(actionTimer > 0){
+        actionTimer--;
+    }
+
+    if(bn::keypad::a_pressed()){
+        action = PlayerAction::Attack;
+        actionTimer = 10;
+    }else if(action & PlayerAction::Attack && actionTimer <= 0){
+        action = PlayerAction::None;
+        actionTimer = 0;
+    }
+
+    animate();
+
 }
 
-void Player::Move()
+
+
+void Player::move()
 {
+
     if(bn::keypad::up_held())
     {
-        sprite.set_y(sprite.y() - 1);
+        if(sprite.y() > - 10)
+            sprite.set_y(sprite.y() - 1);
         facing = 0;
-        sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(1));
     }
     if(bn::keypad::down_held())
     {
-        sprite.set_y(sprite.y() + 1);
+
+        if(sprite.y() <  10)
+            sprite.set_y(sprite.y() + 1);
         facing = 1;
-        sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(0));
     }
     if(bn::keypad::left_held())
     {
-        sprite.set_x(sprite.x() - 1);
+        if(sprite.x() > - 10)
+            sprite.set_x(sprite.x() - 1);
         facing = 2;
-        sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(2));
-        sprite.set_vertical_flip(true);
     }
     if(bn::keypad::right_held())
     {
-        sprite.set_x(sprite.x() + 1);
+        if(sprite.x() < 10)
+            sprite.set_x(sprite.x() + 1);
         facing = 3;
-        sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(2));
-        sprite.set_vertical_flip(false);
+
+    }
+}
+
+void Player::animate(){
+
+    if(action & PlayerAction::Attack){
+        switch(facing){
+        case 0:
+            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(25));
+            break;
+        case 2:
+            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(22));
+            break;
+        case 3:
+        case 1:
+        default:
+            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(18));
+            break;
+        }
+
+    }else{
+        switch(facing){
+        case 0:
+            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(10));
+            break;
+        case 2:
+            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(4));
+            break;
+        case 3:
+        case 1:
+        default:
+            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(0));
+            break;
+        }
     }
 }
 

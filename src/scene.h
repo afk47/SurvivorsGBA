@@ -5,7 +5,8 @@ class Scene
 {
 public:
     Scene() {};
-    virtual void Update();
+    virtual ~Scene() = default;
+    virtual void update();
 private:
 
 private:

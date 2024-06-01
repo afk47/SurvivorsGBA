@@ -14,7 +14,7 @@ constexpr bn::fixed_t<12> M_PI_4 = 0.7853981633974483;
 constexpr bn::fixed_t<12> M_RADIAN_DEG = 57.2957795131;
 
 
-static bn::fixed_point normalizeVector(bn::fixed_point vector){
+inline bn::fixed_point normalizeVector(bn::fixed_point vector){
 
     bn::fixed_t<12> magnitude = bn::sqrt(vector.x() * vector.x() + vector.y()* vector.y());
 
@@ -28,7 +28,7 @@ static bn::fixed_point normalizeVector(bn::fixed_point vector){
 }
 
 
-static bn::fixed_t<12> fastArcTanDeg(bn::fixed_t<12> x){
+inline bn::fixed_t<12> fastArcTanDeg(bn::fixed_t<12> x){
     bn::fixed_t<12> fatrad = M_PI_4 * x - x * ((x >= 0) ? x : -x - 1) * (0.2447 + 0.0663 * (x >= 0) ? x : -x);
     return fatrad * M_RADIAN_DEG;
 
