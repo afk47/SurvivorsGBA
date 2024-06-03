@@ -19,6 +19,7 @@ public:
 
     Enemy SetRandom(bn::random* value) {random = value; return *this;}
     const bn::fixed_point position(){ return sprite.position(); }
+    void RandomizePosition();
 
 private:
     bn::sprite_ptr sprite = bn::sprite_items::ball.create_sprite(0,0);

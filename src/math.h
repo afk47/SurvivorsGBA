@@ -14,6 +14,14 @@ constexpr bn::fixed_t<12> M_PI_4 = 0.7853981633974483;
 constexpr bn::fixed_t<12> M_RADIAN_DEG = 57.2957795131;
 
 
+struct Rect{
+    bn::fixed_t<12> x,y,w,h;
+};
+
+struct Circle{ //TODO: Check if necessary.
+    bn::fixed_t<12> x,y,r;
+};
+
 inline bn::fixed_point normalizeVector(bn::fixed_point vector){
 
     bn::fixed_t<12> magnitude = bn::sqrt(vector.x() * vector.x() + vector.y()* vector.y());
@@ -34,4 +42,28 @@ inline bn::fixed_t<12> fastArcTanDeg(bn::fixed_t<12> x){
 
 }
 
+//Rect - Rect Collision
+inline bool collisionAABB(Rect rect1, Rect rect2)
+{
+    return
+        (
+        rect1.x < rect2.x + rect2.w &&
+        rect1.x + rect1.w > rect2.x &&
+        rect1.y < rect2.y + rect2.h &&
+        rect1.y + rect1.h > rect2.y
+        );
+
+}
+
+//Circle-Circle Collision, TODO: Check if necessary.
+inline bool collisionCircle(Circle circ1, Circle circ2)
+{
+    return (circ1.x - circ2.x)*(circ1.x - circ2.x) + (circ1.y - circ2.y)*(circ1.y - circ2.y)< (circ2.r + circ1.r)*(circ2.r + circ1.r);
+}
+
+// TODO: Circle-Rect TODO: Check if necessary.
+inline bool collisionCircleRect(Rect rect, Circle circ){
+
+    return false;
+}
 

@@ -12,7 +12,7 @@ Player::Player(const bn::camera_ptr& camera)
 
 void Player::update()
 {
-    move();
+ //   move();
 
 
 
@@ -20,10 +20,8 @@ void Player::update()
         actionTimer--;
     }
 
-    if(bn::keypad::a_pressed()){
-        action = PlayerAction::Attack;
-        actionTimer = 10;
-    }else if(action & PlayerAction::Attack && actionTimer <= 0){
+
+    if(action & PlayerAction::Attack && actionTimer <= 0){
         action = PlayerAction::None;
         actionTimer = 0;
     }
@@ -32,38 +30,11 @@ void Player::update()
 
 }
 
-
-
-void Player::move()
-{
-
-    if(bn::keypad::up_held())
-    {
-        if(sprite.y() > - 10)
-            sprite.set_y(sprite.y() - 1);
-        facing = 0;
-    }
-    if(bn::keypad::down_held())
-    {
-
-        if(sprite.y() <  10)
-            sprite.set_y(sprite.y() + 1);
-        facing = 1;
-    }
-    if(bn::keypad::left_held())
-    {
-        if(sprite.x() > - 10)
-            sprite.set_x(sprite.x() - 1);
-        facing = 2;
-    }
-    if(bn::keypad::right_held())
-    {
-        if(sprite.x() < 10)
-            sprite.set_x(sprite.x() + 1);
-        facing = 3;
-
-    }
+void Player::attack(){
+    action = action | PlayerAction::Attack;
+    actionTimer = 10;
 }
+
 
 void Player::animate(){
 
