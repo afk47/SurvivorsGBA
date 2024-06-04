@@ -5,9 +5,9 @@
 #include "bn_sprite_builder.h"
 
 Player::Player(const bn::camera_ptr& camera)
-    :sprite(bn::sprite_items::goblin.create_sprite(0,0)),camera(camera)
+    :p_sprite(bn::sprite_items::goblin.create_sprite(0,0)),camera(camera)
 {
-    sprite.set_camera(camera);
+    p_sprite.set_camera(camera);
 }
 
 void Player::update()
@@ -35,36 +35,46 @@ void Player::attack(){
     actionTimer = 10;
 }
 
+bool Player::take_damage(int damage){
+    health -= damage;
+    if(health <= 0){
+        health = 0;
+        return true;
+    }
+    return false;
+
+}
+
 
 void Player::animate(){
 
     if(action & PlayerAction::Attack){
         switch(facing){
         case 0:
-            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(25));
+            p_sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(25));
             break;
         case 2:
-            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(22));
+            p_sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(22));
             break;
         case 3:
         case 1:
         default:
-            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(18));
+            p_sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(18));
             break;
         }
 
     }else{
         switch(facing){
         case 0:
-            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(10));
+            p_sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(10));
             break;
         case 2:
-            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(4));
+            p_sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(4));
             break;
         case 3:
         case 1:
         default:
-            sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(0));
+            p_sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(0));
             break;
         }
     }

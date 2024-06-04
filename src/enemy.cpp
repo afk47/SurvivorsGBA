@@ -12,17 +12,17 @@ Enemy::Enemy(const bn::camera_ptr& camera)
 
 }
 
-void Enemy::Move(bn::fixed_point_t<12> target){
+void Enemy::move(bn::fixed_point_t<12> target){
 
     bn::fixed_point diff = target - sprite.position();
 
-    diff = normalizeVector(diff);
+    diff = normalize_vector(diff);
 
     sprite.set_position(sprite.position() + (diff / 2));
 }
 
 
-bool Enemy::takeDamage(int damage){
+bool Enemy::take_damage(int damage){
     health -= damage;
     if(health <= 0){
         return true;
@@ -32,6 +32,6 @@ bool Enemy::takeDamage(int damage){
 
 }
 
-void Enemy::RandomizePosition(){
+void Enemy::randomize_position(){
     sprite.set_position(random->get_int() % 512 - 256, random->get_int() % 512 - 256);
 }

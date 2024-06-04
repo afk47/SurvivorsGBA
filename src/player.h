@@ -22,29 +22,22 @@ class Player
 public:
     Player(const bn::camera_ptr& camera);
     void update();
-
-    inline bn::fixed_point position(){ return sprite.position(); }
-    inline bn::fixed y(){ return sprite.y();}
-    inline bn::fixed x(){ return sprite.x();}
-
-    void set_position(const bn::fixed_point &position){ sprite.set_position(position); }
-    void set_y(const bn::fixed val){ sprite.set_y(val); }
-    void set_x(const bn::fixed val){ sprite.set_x(val); }
     void set_facing(int direction){
         if(direction > 3 || direction < 0)
             return;
         facing = direction;
     }
-
-    void set_camera(const bn::camera_ptr& camera){ sprite.set_camera(camera); this->camera = camera; }
-    inline PlayerAction getPlayerAction(){ return action;}
+    inline PlayerAction get_player_action(){ return action;}
     void attack();
+    bool take_damage(int damage);
+
 private:
 
     void animate();
 
+public:
+    bn::sprite_ptr p_sprite;
 private:
-    bn::sprite_ptr sprite;
     int facing;
     PlayerAction action = PlayerAction::None;
     int actionTimer = 0;
@@ -52,7 +45,7 @@ private:
 
     int animationFrames = 0;
     int frameOfAnim = 0;
-
+    int health = 100;
 };
 
 

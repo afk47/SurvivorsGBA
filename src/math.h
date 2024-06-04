@@ -22,7 +22,7 @@ struct Circle{ //TODO: Check if necessary.
     bn::fixed_t<12> x,y,r;
 };
 
-inline bn::fixed_point normalizeVector(bn::fixed_point vector){
+inline bn::fixed_point normalize_vector(bn::fixed_point vector){
 
     bn::fixed_t<12> magnitude = bn::sqrt(vector.x() * vector.x() + vector.y()* vector.y());
 
@@ -36,7 +36,7 @@ inline bn::fixed_point normalizeVector(bn::fixed_point vector){
 }
 
 
-inline bn::fixed_t<12> fastArcTanDeg(bn::fixed_t<12> x){
+inline bn::fixed_t<12> fast_arc_tan_deg(bn::fixed_t<12> x){
     bn::fixed_t<12> fatrad = M_PI_4 * x - x * ((x >= 0) ? x : -x - 1) * (0.2447 + 0.0663 * (x >= 0) ? x : -x);
     return fatrad * M_RADIAN_DEG;
 

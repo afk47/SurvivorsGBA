@@ -14,12 +14,12 @@ class Enemy
 public:
     Enemy(const bn::camera_ptr& camera);
 
-    void Move(bn::fixed_point_t<12> target);
-    bool takeDamage(int damage); //Returns true if enemy is dead
+    void move(bn::fixed_point_t<12> target);
+    bool take_damage(int damage); //Returns true if enemy is dead
 
-    Enemy SetRandom(bn::random* value) {random = value; return *this;}
+    Enemy set_random(bn::random* value) {random = value; return *this;}
     const bn::fixed_point position(){ return sprite.position(); }
-    void RandomizePosition();
+    void randomize_position();
 
 private:
     bn::sprite_ptr sprite = bn::sprite_items::ball.create_sprite(0,0);
