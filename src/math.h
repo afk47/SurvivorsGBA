@@ -43,7 +43,7 @@ inline bn::fixed_t<12> fast_arc_tan_deg(bn::fixed_t<12> x){
 }
 
 //Rect - Rect Collision
-inline bool collisionAABB(Rect rect1, Rect rect2)
+inline bool collision_AABB(Rect rect1, Rect rect2)
 {
     return
         (
@@ -56,13 +56,13 @@ inline bool collisionAABB(Rect rect1, Rect rect2)
 }
 
 //Circle-Circle Collision, TODO: Check if necessary.
-inline bool collisionCircle(Circle circ1, Circle circ2)
+inline bool collision_circle(Circle circ1, Circle circ2)
 {
     return (circ1.x - circ2.x)*(circ1.x - circ2.x) + (circ1.y - circ2.y)*(circ1.y - circ2.y)< (circ2.r + circ1.r)*(circ2.r + circ1.r);
 }
 
 // TODO: Circle-Rect TODO: Check if necessary.
-inline bool collisionCircleRect(Rect rect, Circle circ){
+inline bool collision_circle_rect(Rect rect, Circle circ){
 
     return false;
 }

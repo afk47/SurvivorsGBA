@@ -36,15 +36,15 @@ private:
     void animate();
 
 public:
-    bn::sprite_ptr p_sprite;
+    bn::sprite_ptr p_Sprite;
 private:
     int facing;
     PlayerAction action = PlayerAction::None;
     int actionTimer = 0;
     bn::camera_ptr camera;
 
-    int animationFrames = 0;
-    int frameOfAnim = 0;
+    int animation_frames = 0;
+    int animation_frame = 0;
     int health = 100;
 };
 

@@ -11,75 +11,80 @@
 #include "bn_string.h"
 #include "bn_fixed_point.h"
 #include "common_variable_8x16_sprite_font.h"
+#include "bn_sprites.h"
 
 FightScene::FightScene():
-    bg(bn::regular_bg_items::fightbg.create_bg(0,0)),
-    camera(bn::camera_ptr::create(0, 0)),
-    player(Player(camera)),
-    internalWindow(bn::rect_window::internal()),
-    dimensions(bg.dimensions().width(),bg.dimensions().height()),
-    padding(48,90),
-    scoreboard(bn::sprite_text_generator(common::variable_8x16_sprite_font))
+    m_BG(bn::regular_bg_items::fightbg.create_bg(0,0)),
+    m_Camera(bn::camera_ptr::create(0, 0)),
+    m_Player(Player(m_Camera)),
+    m_InternalWindow(bn::rect_window::internal()),
+    m_Dimensions(m_BG.dimensions().width(),m_BG.dimensions().height()),
+    m_Padding(48,90),
+    m_TextGenerator(bn::sprite_text_generator(common::variable_8x16_sprite_font))
 
 {
 
-    scoreboard.set_left_alignment();
+    m_TextGenerator.set_left_alignment();
 
     const bn::regular_bg_map_item& map_item = bn::regular_bg_items::fightbg.map_item();
 
     for(int i = 0; i < 50; i++){
-        enemies.push_back(Enemy(camera).set_random(&random));
-        enemies[i].randomize_position();
+       m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
+        m_Enemies[i].randomize_position();
     }
 
     bn::window outside_window = bn::window::outside();
-    outside_window.set_show_bg(bg,false);
+    outside_window.set_show_bg(m_BG,false);
 
 
-    bg.set_camera(camera);
-    bg.set_priority(3);
-    scoreboard.set_bg_priority(0);
-    internalWindow.set_boundaries(-128, -128, 128, 128);
-    internalWindow.set_camera(camera);
+    m_BG.set_camera(m_Camera);
+    m_BG.set_priority(3);
+    m_TextGenerator.set_bg_priority(0);
+    m_InternalWindow.set_boundaries(-128, -128, 128, 128);
+    m_InternalWindow.set_camera(m_Camera);
 }
 
 void FightScene::update()
 {
-    textSprites.clear();
-    player.update();
+    m_TextSprites.clear();
+    m_Player.update();
     process_input();
 
-    PlayerAction action = player.get_player_action();
+    PlayerAction action = m_Player.get_player_action();
 
-    int i = 0;//enemy index
+    int idx = 0;//enemy index
     // destroys enemy when close enough and player is attacking.
-    for(bn::vector<Enemy,128>::const_iterator position = enemies.cbegin(); position < enemies.cend(); ++position)
+    for(bn::vector<Enemy,128>::const_iterator position = m_Enemies.cbegin(); position < m_Enemies.cend(); ++position)
     {
-        enemies[i].move(camera.position() + player.p_sprite.position());
-        bn::fixed_point diff = camera.position() + player.p_sprite.position() - enemies[i].position();
+        m_Enemies[idx].move(m_Camera.position() + m_Player.p_Sprite.position());
+        bn::fixed_point diff = m_Camera.position() + m_Player.p_Sprite.position() - m_Enemies[idx].position();
         if(action & PlayerAction::Attack)
         {
 
             if (diff.x() < 15 && diff.x() > -15 && diff.y() < 15 && diff.y() > -15)
             {
-                if(enemies[i].take_damage(10)){
-                    enemies.erase(position);
-                    score += 100;
+                if(m_Enemies[idx].take_damage(10)){
+                    m_Enemies.erase(position);
+                    m_Score += 100;
                 }
             }
         }else if(diff.x() < 5 && diff.x() > -5 && diff.y() < 5 && diff.y() > -5){
-            if(player.take_damage(100)){
-                enemies.clear();
+            if(m_Player.take_damage(100)){
+                m_Enemies.clear();
                 game_over();
                 break;
             }
         }
-        ++i;
+        ++idx;
     }
 
-    scoreboard.generate(-100 , -70, bn::to_string<32>(score), textSprites);
+    m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
+    int availableSprites = 128 - bn::sprites::used_items_count();
+    BN_LOG(availableSprites);
 
-
+    if(m_Enemies.empty()){
+        wave_screen();
+    }
 
 }
 
@@ -88,65 +93,101 @@ void FightScene::process_input()
 
     if(bn::keypad::left_held())
     {
-        player.set_facing(2);
-        if(-(dimensions.x() - bn::display::width()) / 2 > camera.x() - 1)
+        m_Player.set_facing(2);
+        if(-(m_Dimensions.x() - bn::display::width()) / 2 > m_Camera.x() - 1)
         {
-            player.p_sprite.set_x(bn::max((-dimensions.x() / 2) + padding.x(), player.p_sprite.x() - 1));
+            m_Player.p_Sprite.set_x(bn::max((-m_Dimensions.x() / 2) + m_Padding.x(), m_Player.p_Sprite.x() - 1));
         }
-        camera.set_x(bn::max(-(dimensions.x() - bn::display::width()) / 2, camera.x() - 1));
+        m_Camera.set_x(bn::max(-(m_Dimensions.x() - bn::display::width()) / 2, m_Camera.x() - 1));
     }
     else if(bn::keypad::right_held())
     {
-        player.set_facing(3);
-        if((dimensions.x() - bn::display::width()) / 2 < camera.x() + 1)
+        m_Player.set_facing(3);
+        if((m_Dimensions.x() - bn::display::width()) / 2 < m_Camera.x() + 1)
         {
-            player.p_sprite.set_x(bn::min((dimensions.x() / 2) - padding.x(),player.p_sprite.x() + 1));
+            m_Player.p_Sprite.set_x(bn::min((m_Dimensions.x() / 2) - m_Padding.x(),m_Player.p_Sprite.x() + 1));
         }
-        camera.set_x(bn::min((dimensions.x()- bn::display::width()) / 2,camera.x() + 1));
+        m_Camera.set_x(bn::min((m_Dimensions.x()- bn::display::width()) / 2,m_Camera.x() + 1));
     }
 
     if(bn::keypad::up_held())
     {
-        player.set_facing(0);
-        if(-(dimensions.y() - bn::display::height()) / 2 > camera.y() - 1)
+        m_Player.set_facing(0);
+        if(-(m_Dimensions.y() - bn::display::height()) / 2 > m_Camera.y() - 1)
         {
-            player.p_sprite.set_y(bn::max((-dimensions.y() / 2) + padding.y(), player.p_sprite.y() - 1));
+            m_Player.p_Sprite.set_y(bn::max((-m_Dimensions.y() / 2) + m_Padding.y(), m_Player.p_Sprite.y() - 1));
         }
-        camera.set_y(bn::max(-(dimensions.y() - bn::display::height()) / 2, camera.y() - 1));
+        m_Camera.set_y(bn::max(-(m_Dimensions.y() - bn::display::height()) / 2, m_Camera.y() - 1));
     }
     else if(bn::keypad::down_held())
     {
-        player.set_facing(1);
-        if((dimensions.y() - bn::display::height()) / 2 < camera.y() + 1)
+        m_Player.set_facing(1);
+        if((m_Dimensions.y() - bn::display::height()) / 2 < m_Camera.y() + 1)
         {
-            player.p_sprite.set_y(bn::min((dimensions.y() / 2) - padding.y(),player.p_sprite.y() + 1));
+            m_Player.p_Sprite.set_y(bn::min((m_Dimensions.y() / 2) - m_Padding.y(),m_Player.p_Sprite.y() + 1));
         }
-        camera.set_y(bn::min((dimensions.y() - bn::display::height()) / 2,camera.y() + 1));
+        m_Camera.set_y(bn::min((m_Dimensions.y() - bn::display::height()) / 2,m_Camera.y() + 1));
     }
 
     if(bn::keypad::a_pressed()){
-        player.attack();
+        m_Player.attack();
+    }
+
+    if(bn::keypad::select_pressed()){
+        restart();
     }
 }
 
 void FightScene::game_over(){
-    scoreboard.set_alignment(bn::sprite_text_generator::alignment_type::CENTER);
-    scoreboard.generate(0,-10,"GAME OVER!", textSprites);
-    scoreboard.generate(0,0,bn::to_string<32>(score),textSprites);
-    camera.set_position(0,0);
-    player.p_sprite.set_visible(false);
+    m_TextGenerator.set_alignment(bn::sprite_text_generator::alignment_type::CENTER);
+    m_TextGenerator.generate(0,-10,"GAME OVER!", m_TextSprites);
+    m_TextGenerator.generate(0,0,bn::to_string<10>(m_Score),m_TextSprites);
+    m_Camera.set_position(0,0);
+    m_Player.p_Sprite.set_visible(false);
 
     while(!bn::keypad::start_pressed()){
         bn::core::update();
     }
 
-    score = 0;
+
+    restart();
+
+}
+
+void FightScene::restart(){
+    m_Score = 0;
+
     for(int i = 0; i < 50; i++){
-        enemies.push_back(Enemy(camera).set_random(&random));
-        enemies[i].randomize_position();
+        m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
+        m_Enemies[i].randomize_position();
     }
-    player.p_sprite.set_position(0,0);
-    player.p_sprite.set_visible(true);
+    m_Player.p_Sprite.set_position(0,0);
+    m_Player.p_Sprite.set_visible(true);
+}
 
+void FightScene::wave_screen(){
+    for(int i = 0; i < 120; i++){ //Wait ~2 seconds on wave screen
+        m_TextSprites.clear();
+        m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
+        m_TextGenerator.generate(0,-10,"WAVE " + bn::to_string<6>(m_Wave),m_TextSprites);
+        bn::core::update();
+    }
+    ++m_Wave;
 
+    int availableSprites = 128 - bn::sprites::used_items_count();
+    BN_LOG(availableSprites);
+    int nextWaveEnemies = m_Random.get_int() % (availableSprites % 100 - 40) + 20;
+
+    for(int i = 0; i < nextWaveEnemies; i++){
+        availableSprites = 128 - bn::sprites::used_items_count();
+        BN_LOG(availableSprites);
+        m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
+        m_Enemies[i].randomize_position();
+        bn::fixed_point diff = m_Camera.position() + m_Player.p_Sprite.position() - m_Enemies[i].position();
+        if (diff.x() < 15 && diff.x() > -15 && diff.y() < 15 && diff.y() > -15)
+        {
+            m_Enemies[i].move(m_Enemies[i].position() - diff);
+        }
+
+    }
 }
