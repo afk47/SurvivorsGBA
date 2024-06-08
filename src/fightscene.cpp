@@ -1,7 +1,6 @@
 #include "fightscene.h"
 
 #include "bn_regular_bg_item.h"
-#include "math.h"
 #include "core.h"
 #include "bn_regular_bg_ptr.h"
 #include "bn_regular_bg_items_fightbg.h"
@@ -57,18 +56,18 @@ void FightScene::update()
     for(bn::vector<Enemy,128>::const_iterator position = m_Enemies.cbegin(); position < m_Enemies.cend(); ++position)
     {
         m_Enemies[idx].move(m_Camera.position() + m_Player.p_Sprite.position());
-        bn::fixed_point diff = m_Camera.position() + m_Player.p_Sprite.position() - m_Enemies[idx].position();
+
         if(action & PlayerAction::Attack)
         {
 
-            if (diff.x() < 15 && diff.x() > -15 && diff.y() < 15 && diff.y() > -15)
+            if (m_Player.get_hitbox().is_inside(m_Enemies[idx].position()))
             {
-                if(m_Enemies[idx].take_damage(10)){
+                if(m_Enemies[idx].take_damage(5)){
                     m_Enemies.erase(position);
                     m_Score += 100;
                 }
             }
-        }else if(diff.x() < 5 && diff.x() > -5 && diff.y() < 5 && diff.y() > -5){
+        }else if(m_Player.get_hurtbox().is_inside(m_Enemies[idx].position())){
             if(m_Player.take_damage(100)){
                 m_Enemies.clear();
                 game_over();
@@ -174,6 +173,9 @@ void FightScene::wave_screen(){
     }
     ++m_Wave;
 
+}
+
+void FightScene::populate_wave(){
     int availableSprites = 128 - bn::sprites::used_items_count();
     BN_LOG(availableSprites);
     int nextWaveEnemies = m_Random.get_int() % (availableSprites % 100 - 40) + 20;
@@ -188,6 +190,7 @@ void FightScene::wave_screen(){
         {
             m_Enemies[i].move(m_Enemies[i].position() - diff);
         }
-
     }
+
+
 }

@@ -4,25 +4,36 @@
 #include "bn_sprite_builder.h"
 
 Player::Player(const bn::camera_ptr& camera)
-    :p_Sprite(bn::sprite_items::goblin.create_sprite(0,0)),camera(camera)
+    :p_Sprite(bn::sprite_items::goblin.create_sprite(0,0)),
+    m_camera(camera),
+    m_size_hitbox(10),
+    m_size_hurtbox(5),
+    m_hitbox({p_Sprite.x() - m_size_hitbox,p_Sprite.y()- m_size_hitbox,p_Sprite.x() + m_size_hitbox,p_Sprite.y() + m_size_hitbox}),
+    m_hurtbox({p_Sprite.x() - m_size_hurtbox,p_Sprite.y()- m_size_hurtbox,p_Sprite.x() + m_size_hurtbox,p_Sprite.y() + m_size_hurtbox})
 {
     p_Sprite.set_camera(camera);
+
 }
 
 void Player::update()
 {
  //   move();
 
+    m_hitbox.set_position({p_Sprite.x()-m_size_hitbox,p_Sprite.y()-m_size_hitbox});
+    m_hurtbox.set_position({p_Sprite.x()-m_size_hurtbox,p_Sprite.y()-m_size_hurtbox});
 
 
-    if(actionTimer > 0){
-        actionTimer--;
-    }
+    if(m_action_timer > 0)
+        m_action_timer--;
 
 
-    if(action & PlayerAction::Attack && actionTimer <= 0){
-        action = PlayerAction::None;
-        actionTimer = 0;
+    if(m_cooldown > 0)
+        m_cooldown--;
+
+
+    if(m_action & PlayerAction::Attack && m_action_timer <= 0){
+        m_action = PlayerAction::None;
+        m_hitbox.set_active(false);
     }
 
     animate();
@@ -30,14 +41,18 @@ void Player::update()
 }
 
 void Player::attack(){
-    action = action | PlayerAction::Attack;
-    actionTimer = 10;
+    if(m_cooldown <= 0){
+        m_action = m_action | PlayerAction::Attack;
+        m_action_timer = 10;
+        m_cooldown = 30;
+        m_hitbox.set_active(true);
+    }
 }
 
 bool Player::take_damage(int damage){
-    health -= damage;
-    if(health <= 0){
-        health = 0;
+    m_health -= damage;
+    if(m_health <= 0){
+        m_health = 0;
         return true;
     }
     return false;
@@ -47,8 +62,8 @@ bool Player::take_damage(int damage){
 
 void Player::animate(){
 
-    if(action & PlayerAction::Attack){
-        switch(facing){
+    if(m_action & PlayerAction::Attack ){
+        switch(m_facing){
         case 0:
             p_Sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(25));
             break;
@@ -63,7 +78,7 @@ void Player::animate(){
         }
 
     }else{
-        switch(facing){
+        switch(m_facing){
         case 0:
             p_Sprite.set_tiles(bn::sprite_items::goblin.tiles_item().create_tiles(10));
             break;

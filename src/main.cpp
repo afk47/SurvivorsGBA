@@ -2,7 +2,7 @@
 
 #include "fightscene.h"
 
-#include "math.h"
+
 
 
 

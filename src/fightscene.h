@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FIGHTSCENE_H
 #define FIGHTSCENE_H
 
@@ -21,6 +22,7 @@ private:
     void game_over();
     void wave_screen();
     void restart();
+    void populate_wave();
 private:
     Player m_Player;
     bn::vector<Enemy,128> m_Enemies;
