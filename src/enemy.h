@@ -18,14 +18,15 @@ public:
     void move(bn::fixed_point_t<12> target);
     bool take_damage(int damage); //Returns true if enemy is dead
 
-    Enemy set_random(bn::random* value) {random = value; return *this;}
-    const bn::fixed_point position(){ return sprite.position(); }
+    Enemy set_random(bn::random* value) {m_random = value; return *this;}
+    const bn::fixed_point position(){ return m_sprite.position(); }
     void randomize_position();
 
 private:
-    bn::sprite_ptr sprite = bn::sprite_items::ball.create_sprite(0,0);
-    bn::random* random;
-    int health;
+    bn::camera_ptr m_camera;
+    bn::sprite_ptr m_sprite;
+    bn::random* m_random;
+    int m_health;
 };
 
 #endif // ENEMY_H

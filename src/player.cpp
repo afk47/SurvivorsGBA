@@ -7,9 +7,9 @@ Player::Player(const bn::camera_ptr& camera)
     :p_Sprite(bn::sprite_items::goblin.create_sprite(0,0)),
     m_camera(camera),
     m_size_hitbox(10),
-    m_size_hurtbox(5),
-    m_hitbox({p_Sprite.x() - m_size_hitbox,p_Sprite.y()- m_size_hitbox,p_Sprite.x() + m_size_hitbox,p_Sprite.y() + m_size_hitbox}),
-    m_hurtbox({p_Sprite.x() - m_size_hurtbox,p_Sprite.y()- m_size_hurtbox,p_Sprite.x() + m_size_hurtbox,p_Sprite.y() + m_size_hurtbox})
+    m_size_hurtbox(3),
+    m_hitbox({p_Sprite.x() - m_size_hitbox,p_Sprite.y()- m_size_hitbox,m_size_hitbox * 2,m_size_hitbox* 2}),
+    m_hurtbox({p_Sprite.x() - m_size_hurtbox,p_Sprite.y()- m_size_hurtbox,m_size_hurtbox* 2,m_size_hurtbox* 2})
 {
     p_Sprite.set_camera(camera);
 
@@ -17,9 +17,9 @@ Player::Player(const bn::camera_ptr& camera)
 
 void Player::update()
 {
- //   move();
 
-    m_hitbox.set_position({p_Sprite.x()-m_size_hitbox,p_Sprite.y()-m_size_hitbox});
+
+    m_hitbox.set_position({p_Sprite.x()-m_size_hitbox, p_Sprite.y()-m_size_hitbox});
     m_hurtbox.set_position({p_Sprite.x()-m_size_hurtbox,p_Sprite.y()-m_size_hurtbox});
 
 

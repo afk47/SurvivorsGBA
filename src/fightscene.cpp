@@ -18,17 +18,17 @@ FightScene::FightScene():
     m_Player(Player(m_Camera)),
     m_InternalWindow(bn::rect_window::internal()),
     m_Dimensions(m_BG.dimensions().width(),m_BG.dimensions().height()),
-    m_Padding(48,90),
+    m_Padding(36,36),
     m_TextGenerator(bn::sprite_text_generator(common::variable_8x16_sprite_font))
 
 {
 
     m_TextGenerator.set_left_alignment();
 
-    const bn::regular_bg_map_item& map_item = bn::regular_bg_items::fightbg.map_item();
 
+    m_Player = Player(m_Camera);
     for(int i = 0; i < 50; i++){
-       m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
+        m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
         m_Enemies[i].randomize_position();
     }
 
@@ -45,6 +45,8 @@ FightScene::FightScene():
 
 void FightScene::update()
 {
+
+    bn::core::update();
     m_TextSprites.clear();
     m_Player.update();
     process_input();
@@ -55,11 +57,10 @@ void FightScene::update()
     // destroys enemy when close enough and player is attacking.
     for(bn::vector<Enemy,128>::const_iterator position = m_Enemies.cbegin(); position < m_Enemies.cend(); ++position)
     {
-        m_Enemies[idx].move(m_Camera.position() + m_Player.p_Sprite.position());
+        m_Enemies[idx].move(m_Player.p_Sprite.position());
 
         if(action & PlayerAction::Attack)
         {
-
             if (m_Player.get_hitbox().is_inside(m_Enemies[idx].position()))
             {
                 if(m_Enemies[idx].take_damage(5)){
@@ -77,6 +78,8 @@ void FightScene::update()
         ++idx;
     }
 
+
+
     m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
     int availableSprites = 128 - bn::sprites::used_items_count();
     BN_LOG(availableSprites);
@@ -84,6 +87,8 @@ void FightScene::update()
     if(m_Enemies.empty()){
         wave_screen();
     }
+
+
 
 }
 
@@ -93,38 +98,35 @@ void FightScene::process_input()
     if(bn::keypad::left_held())
     {
         m_Player.set_facing(2);
-        if(-(m_Dimensions.x() - bn::display::width()) / 2 > m_Camera.x() - 1)
-        {
-            m_Player.p_Sprite.set_x(bn::max((-m_Dimensions.x() / 2) + m_Padding.x(), m_Player.p_Sprite.x() - 1));
-        }
+        // If the camera position is at the edge of the map move the player instead
+
+        m_Player.p_Sprite.set_x(bn::max((-m_Dimensions.x() / 2) + m_Padding.x(), m_Player.p_Sprite.x() - 1));
+
         m_Camera.set_x(bn::max(-(m_Dimensions.x() - bn::display::width()) / 2, m_Camera.x() - 1));
     }
     else if(bn::keypad::right_held())
     {
         m_Player.set_facing(3);
-        if((m_Dimensions.x() - bn::display::width()) / 2 < m_Camera.x() + 1)
-        {
-            m_Player.p_Sprite.set_x(bn::min((m_Dimensions.x() / 2) - m_Padding.x(),m_Player.p_Sprite.x() + 1));
-        }
+        // If the camera position is at the edge of the map move the player instead
+        m_Player.p_Sprite.set_x(bn::min((m_Dimensions.x() / 2) - m_Padding.x(),m_Player.p_Sprite.x() + 1));
+
         m_Camera.set_x(bn::min((m_Dimensions.x()- bn::display::width()) / 2,m_Camera.x() + 1));
     }
 
     if(bn::keypad::up_held())
     {
         m_Player.set_facing(0);
-        if(-(m_Dimensions.y() - bn::display::height()) / 2 > m_Camera.y() - 1)
-        {
-            m_Player.p_Sprite.set_y(bn::max((-m_Dimensions.y() / 2) + m_Padding.y(), m_Player.p_Sprite.y() - 1));
-        }
+
+        m_Player.p_Sprite.set_y(bn::max((-m_Dimensions.y() / 2) + m_Padding.y(), m_Player.p_Sprite.y() - 1));
+
         m_Camera.set_y(bn::max(-(m_Dimensions.y() - bn::display::height()) / 2, m_Camera.y() - 1));
     }
     else if(bn::keypad::down_held())
     {
         m_Player.set_facing(1);
-        if((m_Dimensions.y() - bn::display::height()) / 2 < m_Camera.y() + 1)
-        {
-            m_Player.p_Sprite.set_y(bn::min((m_Dimensions.y() / 2) - m_Padding.y(),m_Player.p_Sprite.y() + 1));
-        }
+
+        m_Player.p_Sprite.set_y(bn::min((m_Dimensions.y() / 2) - m_Padding.y(),m_Player.p_Sprite.y() + 1));
+
         m_Camera.set_y(bn::min((m_Dimensions.y() - bn::display::height()) / 2,m_Camera.y() + 1));
     }
 
