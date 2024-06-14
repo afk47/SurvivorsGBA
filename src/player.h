@@ -5,6 +5,7 @@
 #include "bn_sprite_ptr.h"
 #include "bn_camera_ptr.h"
 #include "hitbox.h"
+#include "sound.h"
 
 enum PlayerAction{
     None = 0,
@@ -29,15 +30,15 @@ public:
 
 
     //Getters and Setters
-    inline PlayerAction get_player_action(){ return m_action;}
+    inline PlayerAction get_player_action(){ return m_Action;}
     void set_facing(int direction){
         if(direction > 3 || direction < 0)
             return;
-        m_facing = direction;
+        m_Facing = direction;
     }
-    Hitbox get_hitbox(){return m_hitbox;}
+    Hitbox get_hitbox(){return m_Hitbox;}
 
-    Hitbox get_hurtbox(){return m_hurtbox;}
+    Hitbox get_hurtbox(){return m_Hurtbox;}
 private:
 
     void animate();
@@ -46,18 +47,17 @@ public:
     bn::sprite_ptr p_Sprite;
 
 private:
-    int m_facing;
-    PlayerAction m_action = PlayerAction::None;
-    int m_action_timer = 0;
-    bn::camera_ptr m_camera;
-    int m_cooldown = 0;
-    int m_animation_frames = 0;
-    int m_animation_frame = 0;
-    int m_health = 100;
-    bn::fixed m_size_hitbox;
-    bn::fixed m_size_hurtbox;
-    Hitbox m_hitbox;
-    Hitbox m_hurtbox;
+    SoundController* m_Sound;
+    bn::camera_ptr m_Camera;
+    int m_Facing;
+    PlayerAction m_Action = PlayerAction::None;
+    int m_Action_Timer = 0;
+    int m_Cooldown = 0;
+    int m_Health = 100;
+    bn::fixed m_Size_Hitbox;
+    bn::fixed m_Size_Hurtbox;
+    Hitbox m_Hitbox;
+    Hitbox m_Hurtbox;
 };
 
 

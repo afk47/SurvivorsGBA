@@ -11,11 +11,13 @@
 #include "enemy.h"
 #include "bn_rect_window.h"
 #include "bn_sprite_text_generator.h"
+#include "sound.h"
+
 
 class FightScene : public Scene
 {
 public:
-    FightScene();
+    FightScene(SoundController& sound);
     void update();
     void process_input();
 private:
@@ -24,11 +26,14 @@ private:
     void restart();
     void populate_wave();
 private:
-    Player m_Player;
-    bn::vector<Enemy,128> m_Enemies;
-    bn::regular_bg_ptr m_BG;
-    bn::random m_Random;
+    static int constexpr WAVE_SCREEN_TIMER = 80;
+
+    SoundController& m_Sound;
     bn::camera_ptr m_Camera;
+    Player m_Player;
+    bn::regular_bg_ptr m_BG;
+    bn::vector<Enemy,128> m_Enemies;
+    bn::random m_Random;
     bn::rect_window m_InternalWindow;
     bn::fixed_point_t<12> m_Dimensions;
     bn::fixed_point_t<12> m_Padding;
@@ -36,6 +41,8 @@ private:
     bn::vector<bn::sprite_ptr, 32> m_TextSprites;
     int m_Score = 0;
     int m_Wave = 1;
+
+
 };
 
 #endif // FIGHTSCENE_H

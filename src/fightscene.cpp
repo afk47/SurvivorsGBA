@@ -12,10 +12,11 @@
 #include "common_variable_8x16_sprite_font.h"
 #include "bn_sprites.h"
 
-FightScene::FightScene():
-    m_BG(bn::regular_bg_items::fightbg.create_bg(0,0)),
+FightScene::FightScene(SoundController& sound):
+    m_Sound(sound),
     m_Camera(bn::camera_ptr::create(0, 0)),
     m_Player(Player(m_Camera)),
+    m_BG(bn::regular_bg_items::fightbg.create_bg(0,0)),
     m_InternalWindow(bn::rect_window::internal()),
     m_Dimensions(m_BG.dimensions().width(),m_BG.dimensions().height()),
     m_Padding(36,36),
@@ -41,6 +42,8 @@ FightScene::FightScene():
     m_TextGenerator.set_bg_priority(0);
     m_InternalWindow.set_boundaries(-128, -128, 128, 128);
     m_InternalWindow.set_camera(m_Camera);
+    m_Sound.play_music();
+
 }
 
 void FightScene::update()
@@ -50,17 +53,22 @@ void FightScene::update()
     m_TextSprites.clear();
     m_Player.update();
     process_input();
+    m_Sound.update_music();
 
     PlayerAction action = m_Player.get_player_action();
 
+
+
     int idx = 0;//enemy index
-    // destroys enemy when close enough and player is attacking.
+    //Checks for collisions, if performance suffers look into other methods of
     for(bn::vector<Enemy,128>::const_iterator position = m_Enemies.cbegin(); position < m_Enemies.cend(); ++position)
     {
         m_Enemies[idx].move(m_Player.p_Sprite.position());
 
         if(action & PlayerAction::Attack)
         {
+
+
             if (m_Player.get_hitbox().is_inside(m_Enemies[idx].position()))
             {
                 if(m_Enemies[idx].take_damage(5)){
@@ -82,7 +90,6 @@ void FightScene::update()
 
     m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
     int availableSprites = 128 - bn::sprites::used_items_count();
-    BN_LOG(availableSprites);
 
     if(m_Enemies.empty()){
         wave_screen();
@@ -98,7 +105,6 @@ void FightScene::process_input()
     if(bn::keypad::left_held())
     {
         m_Player.set_facing(2);
-        // If the camera position is at the edge of the map move the player instead
 
         m_Player.p_Sprite.set_x(bn::max((-m_Dimensions.x() / 2) + m_Padding.x(), m_Player.p_Sprite.x() - 1));
 
@@ -107,7 +113,6 @@ void FightScene::process_input()
     else if(bn::keypad::right_held())
     {
         m_Player.set_facing(3);
-        // If the camera position is at the edge of the map move the player instead
         m_Player.p_Sprite.set_x(bn::min((m_Dimensions.x() / 2) - m_Padding.x(),m_Player.p_Sprite.x() + 1));
 
         m_Camera.set_x(bn::min((m_Dimensions.x()- bn::display::width()) / 2,m_Camera.x() + 1));
@@ -145,7 +150,7 @@ void FightScene::game_over(){
     m_TextGenerator.generate(0,0,bn::to_string<10>(m_Score),m_TextSprites);
     m_Camera.set_position(0,0);
     m_Player.p_Sprite.set_visible(false);
-
+    m_Sound.set_music(bn::music_items::necromancerscastle);
     while(!bn::keypad::start_pressed()){
         bn::core::update();
     }
@@ -158,6 +163,7 @@ void FightScene::game_over(){
 void FightScene::restart(){
     m_Score = 0;
 
+    m_Sound.set_music(bn::music_items::castle8bit);
     for(int i = 0; i < 50; i++){
         m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
         m_Enemies[i].randomize_position();
@@ -167,12 +173,13 @@ void FightScene::restart(){
 }
 
 void FightScene::wave_screen(){
-    for(int i = 0; i < 120; i++){ //Wait ~2 seconds on wave screen
+    for(int i = 0; i < WAVE_SCREEN_TIMER; i++){ //Wait on wave screen for WAVE_SCREEN_TIMER frames
         m_TextSprites.clear();
         m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
         m_TextGenerator.generate(0,-10,"WAVE " + bn::to_string<6>(m_Wave),m_TextSprites);
         bn::core::update();
     }
+    populate_wave();
     ++m_Wave;
 
 }
