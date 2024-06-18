@@ -14,19 +14,21 @@ class Enemy
 {
 public:
     Enemy(const bn::camera_ptr& camera);
+    Enemy(const bn::camera_ptr& camera,bn::sprite_item sprite);
 
     void move(bn::fixed_point_t<12> target);
     bool take_damage(int damage); //Returns true if enemy is dead
 
-    Enemy set_random(bn::random* value) {m_random = value; return *this;}
-    const bn::fixed_point position(){ return m_sprite.position(); }
+    Enemy set_random(bn::random* value) {m_Random = value; return *this;}
+    const bn::fixed_point position(){ return m_Sprite.position(); }
     void randomize_position();
 
 private:
-    bn::camera_ptr m_camera;
-    bn::sprite_ptr m_sprite;
-    bn::random* m_random;
-    int m_health;
+    bn::camera_ptr m_Camera;
+    bn::sprite_ptr m_Sprite;
+    bn::random* m_Random;
+    int m_Health;
+    bn::fixed m_Speed;
 };
 
 #endif // ENEMY_H

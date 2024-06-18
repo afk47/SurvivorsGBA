@@ -2,3 +2,5 @@ include
 build
 butano/include
 butano/common/include
+butano/hw/include
+butano/hw/3rdParty/libtonc/include

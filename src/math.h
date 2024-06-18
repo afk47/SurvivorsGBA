@@ -43,6 +43,7 @@ inline bool collision_AABB(Rect rect1, Rect rect2)
 }
 
 
+
 inline bn::fixed_point center(Rect rect){
     auto cX = (rect.x + rect.x + rect.w) / 2;
     auto cY = (rect.y + rect.y + rect.h) / 2;

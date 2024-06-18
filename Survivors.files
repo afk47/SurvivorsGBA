@@ -9,9 +9,13 @@ src/fightscene.cpp
 src/fightscene.h
 src/hitbox.cpp
 src/hitbox.h
+src/levelupmenu.cpp
+src/levelupmenu.h
 src/main.cpp
 src/math.h
 src/player.cpp
 src/player.h
 src/scene.h
 src/sound.h
+src/spritedoubler.cpp
+src/spritedoubler.h

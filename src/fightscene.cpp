@@ -11,6 +11,9 @@
 #include "bn_fixed_point.h"
 #include "common_variable_8x16_sprite_font.h"
 #include "bn_sprites.h"
+#include "levelupmenu.h"
+#include "bn_sprite_items_slime.h"
+
 
 FightScene::FightScene(SoundController& sound):
     m_Sound(sound),
@@ -23,15 +26,12 @@ FightScene::FightScene(SoundController& sound):
     m_TextGenerator(bn::sprite_text_generator(common::variable_8x16_sprite_font))
 
 {
-
+    BN_LOG(sizeof(bn::sprite_ptr));
     m_TextGenerator.set_left_alignment();
 
 
     m_Player = Player(m_Camera);
-    for(int i = 0; i < 50; i++){
-        m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
-        m_Enemies[i].randomize_position();
-    }
+    populate_wave();
 
     bn::window outside_window = bn::window::outside();
     outside_window.set_show_bg(m_BG,false);
@@ -110,6 +110,7 @@ void FightScene::process_input()
 
         m_Camera.set_x(bn::max(-(m_Dimensions.x() - bn::display::width()) / 2, m_Camera.x() - 1));
     }
+
     else if(bn::keypad::right_held())
     {
         m_Player.set_facing(3);
@@ -126,6 +127,7 @@ void FightScene::process_input()
 
         m_Camera.set_y(bn::max(-(m_Dimensions.y() - bn::display::height()) / 2, m_Camera.y() - 1));
     }
+
     else if(bn::keypad::down_held())
     {
         m_Player.set_facing(1);
@@ -135,13 +137,12 @@ void FightScene::process_input()
         m_Camera.set_y(bn::min((m_Dimensions.y() - bn::display::height()) / 2,m_Camera.y() + 1));
     }
 
-    if(bn::keypad::a_pressed()){
-        m_Player.attack();
-    }
+
 
     if(bn::keypad::select_pressed()){
         restart();
     }
+
 }
 
 void FightScene::game_over(){
@@ -162,40 +163,56 @@ void FightScene::game_over(){
 
 void FightScene::restart(){
     m_Score = 0;
+    m_Wave = 1;
 
     m_Sound.set_music(bn::music_items::castle8bit);
-    for(int i = 0; i < 50; i++){
-        m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
-        m_Enemies[i].randomize_position();
-    }
+    populate_wave();
     m_Player.p_Sprite.set_position(0,0);
     m_Player.p_Sprite.set_visible(true);
 }
 
 void FightScene::wave_screen(){
-    for(int i = 0; i < WAVE_SCREEN_TIMER; i++){ //Wait on wave screen for WAVE_SCREEN_TIMER frames
-        m_TextSprites.clear();
-        m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
-        m_TextGenerator.generate(0,-10,"WAVE " + bn::to_string<6>(m_Wave),m_TextSprites);
-        bn::core::update();
-    }
+    // for(int i = 0; i < WAVE_SCREEN_TIMER; ++i){ //Wait on wave screen for WAVE_SCREEN_TIMER frames
+    //     m_TextSprites.clear();
+    //     m_TextGenerator.generate(-100 , -70, bn::to_string<10>(m_Score), m_TextSprites);
+    //     m_TextGenerator.generate(0,-10,"WAVE " + bn::to_string<6>(m_Wave),m_TextSprites);
+    //     bn::core::update();
+    // }
+
+    level_screen();
     populate_wave();
     ++m_Wave;
 
 }
 
+void FightScene::level_screen(){
+    LevelUpMenu levelUpMenu(m_TextGenerator,1);
+    while(!bn::keypad::a_pressed()){
+        levelUpMenu.update();
+        bn::core::update();
+    }
+    WAIT(5);
+}
+
 void FightScene::populate_wave(){
     int availableSprites = 128 - bn::sprites::used_items_count();
-    BN_LOG(availableSprites);
-    int nextWaveEnemies = m_Random.get_int() % (availableSprites % 100 - 40) + 20;
+    int nextWaveEnemies;
 
-    for(int i = 0; i < nextWaveEnemies; i++){
+    switch(m_Wave){
+        case 1: nextWaveEnemies = 10 % availableSprites; break;
+        case 2: nextWaveEnemies = 20 % availableSprites; break;
+        case 3: nextWaveEnemies = 40 % availableSprites; break;
+        case 4: nextWaveEnemies = 70 % availableSprites; break;
+        default: nextWaveEnemies = m_Random.get_int() % (availableSprites % 100 - 40) + 20; break;
+    }
+
+
+    for(int i = 0; i < nextWaveEnemies; ++i){
         availableSprites = 128 - bn::sprites::used_items_count();
-        BN_LOG(availableSprites);
-        m_Enemies.push_back(Enemy(m_Camera).set_random(&m_Random));
+        m_Enemies.push_back(Enemy(m_Camera,bn::sprite_items::slime).set_random(&m_Random));
         m_Enemies[i].randomize_position();
         bn::fixed_point diff = m_Camera.position() + m_Player.p_Sprite.position() - m_Enemies[i].position();
-        if (diff.x() < 15 && diff.x() > -15 && diff.y() < 15 && diff.y() > -15)
+        if (diff.x() < 40 && diff.x() > -40 && diff.y() < 40 && diff.y() > -40)
         {
             m_Enemies[i].move(m_Enemies[i].position() - diff);
         }

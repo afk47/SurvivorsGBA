@@ -1,26 +1,26 @@
 #include "hitbox.h"
 
-Hitbox::Hitbox(Rect dim): p_dimensions(dim),m_center(center(p_dimensions)){
+Hitbox::Hitbox(Rect dim): p_Dimensions(dim),m_Center(center(p_Dimensions)){
 
 
 }
 
 
 bool Hitbox::collides(Hitbox other){
-    if(!m_active || !other.is_active())
+    if(!m_Active || !other.is_active())
         return false;
 
-    return collision_AABB(p_dimensions, other.p_dimensions);
+    return collision_AABB(p_Dimensions, other.p_Dimensions);
 }
 
 bool Hitbox::is_inside(const bn::fixed_point point){
-    if(!m_active)
+    if(!m_Active)
         return false;
 
-    return (point.x() > p_dimensions.x &&
-            point.x() < p_dimensions.x + p_dimensions.w &&
-            point.y() > p_dimensions.y &&
-            point.y() < p_dimensions.y + p_dimensions.h );
+    return (point.x() > p_Dimensions.x &&
+            point.x() < p_Dimensions.x + p_Dimensions.w &&
+            point.y() > p_Dimensions.y &&
+            point.y() < p_Dimensions.y + p_Dimensions.h );
 }
 
 

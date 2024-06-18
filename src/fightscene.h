@@ -23,6 +23,7 @@ public:
 private:
     void game_over();
     void wave_screen();
+    void level_screen();
     void restart();
     void populate_wave();
 private:

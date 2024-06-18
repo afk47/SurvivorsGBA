@@ -6,10 +6,10 @@
 #include "bn_config_audio.h"
 #include "bn_sound.h"
 #include "bn_audio.h"
+#include "bn_sound_items.h"
 #include "bn_music_items_info.h"
 #include "bn_sound_items_info.h"
 #include "bn_music_items.h"
-#include "bn_sound_items.h"
 
 class SoundController{
 public:

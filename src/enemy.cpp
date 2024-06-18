@@ -5,31 +5,44 @@
 
 
 Enemy::Enemy(const bn::camera_ptr& camera)
-    :  m_sprite(bn::sprite_items::ball.create_sprite(0,0)),
-    m_health(10),
-    m_camera(camera)
+    :  m_Sprite(bn::sprite_items::ball.create_sprite(0,0)),
+    m_Health(10),
+    m_Camera(camera),
+    m_Speed(0.3)
 {
 
-    m_sprite.set_position(0,0);
-    m_sprite.set_camera(m_camera);
+    m_Sprite.set_position(0,0);
+    m_Sprite.set_camera(m_Camera);
+
+}
+
+Enemy::Enemy(const bn::camera_ptr& camera,bn::sprite_item sprite)
+    :  m_Sprite(sprite.create_sprite(0,0)),
+    m_Health(10),
+    m_Camera(camera),
+    m_Speed(0.3)
+{
+
+    m_Sprite.set_position(0,0);
+    m_Sprite.set_camera(m_Camera);
 
 }
 
 void Enemy::move(bn::fixed_point_t<12> target){
 
-    m_sprite.set_camera(m_camera);
+    m_Sprite.set_camera(m_Camera);
 
-    bn::fixed_point diff = target - m_sprite.position();
+    bn::fixed_point diff = target - m_Sprite.position();
 
     diff = normalize_vector(diff);
 
-    m_sprite.set_position(m_sprite.position() + (diff / 2));
+    m_Sprite.set_position(m_Sprite.position() + (diff * m_Speed));
 }
 
 
 bool Enemy::take_damage(int damage){
-    m_health -= damage;
-    if(m_health <= 0){
+    m_Health -= damage;
+    if(m_Health <= 0){
         return true;
     }
 
@@ -38,5 +51,5 @@ bool Enemy::take_damage(int damage){
 }
 
 void Enemy::randomize_position(){
-    m_sprite.set_position(m_random->get_int() % 512 - 256, m_random->get_int() % 512 - 256);
+    m_Sprite.set_position(m_Random->get_int() % 512 - 256, m_Random->get_int() % 512 - 256);
 }

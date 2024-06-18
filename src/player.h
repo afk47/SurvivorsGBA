@@ -52,12 +52,13 @@ private:
     int m_Facing;
     PlayerAction m_Action = PlayerAction::None;
     int m_Action_Timer = 0;
-    int m_Cooldown = 0;
+    int m_Cooldown_Attack = 0;
     int m_Health = 100;
     bn::fixed m_Size_Hitbox;
     bn::fixed m_Size_Hurtbox;
     Hitbox m_Hitbox;
     Hitbox m_Hurtbox;
+    bn::sprite_ptr m_SpellSprite;
 };
 
 
