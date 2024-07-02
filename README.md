@@ -3,4 +3,4 @@
 
 To Play run the .GBA file in an emulator of your choice!
 
-VERY EARLY in development! 
+Very bare bones at the moment, this is my first GBA game
